@@ -1,0 +1,102 @@
+[
+  {
+    "name": "Apple",
+    "price": 1.5,
+    "details": "A sweet, crunchy fruit that is great for snacking and comes in various colors, like red, green, and yellow."
+  },
+  {
+    "name": "Banana",
+    "price": 0.3,
+    "details": "A soft, sweet fruit that is high in potassium and easy to peel. Often eaten as a quick snack or added to smoothies."
+  },
+  {
+    "name": "Orange",
+    "price": 0.8,
+    "details": "A citrus fruit known for its juicy, tangy flavor and high vitamin C content. Often consumed as fresh juice or eaten raw."
+  },
+  {
+    "name": "Mango",
+    "price": 2.0,
+    "details": "A tropical fruit with a juicy, sweet, and slightly tangy flavor. It has a smooth outer skin and a large pit in the center."
+  },
+  {
+    "name": "Strawberry",
+    "price": 3.0,
+    "details": "A small, red fruit with a juicy texture and sweet flavor. Often enjoyed fresh, in desserts, or as a topping for cereals."
+  },
+  {
+    "name": "Pineapple",
+    "price": 2.5,
+    "details": "A tropical fruit with a spiky exterior and sweet, juicy interior. It is known for its unique, tangy flavor and is often used in tropical dishes."
+  },
+  {
+    "name": "Watermelon",
+    "price": 4.0,
+    "details": "A large, juicy fruit with a green rind and sweet, red flesh. It's very hydrating and is a popular summer snack."
+  },
+  {
+    "name": "Blueberry",
+    "price": 3.5,
+    "details": "A small, blue fruit that is packed with antioxidants and has a sweet, slightly tart flavor. Great for snacking or adding to desserts."
+  },
+  {
+    "name": "Grape",
+    "price": 2.8,
+    "details": "A small, juicy fruit that comes in bunches. Available in green, red, and purple varieties, they are often eaten raw or used to make wine."
+  },
+  {
+    "name": "Cherry",
+    "price": 4.5,
+    "details": "A small, round fruit with a pit inside. It has a juicy and sweet flavor, often used in desserts or enjoyed fresh."
+  },
+  {
+    "name": "Peach",
+    "price": 1.2,
+    "details": "A juicy fruit with a fuzzy skin and sweet, fragrant flesh. Often enjoyed fresh or used in desserts like pies and cobblers."
+  },
+  {
+    "name": "Kiwi",
+    "price": 1.0,
+    "details": "A small, brown, fuzzy-skinned fruit with bright green flesh and tiny black seeds. Known for its tangy and sweet flavor."
+  },
+  {
+    "name": "Papaya",
+    "price": 2.3,
+    "details": "A tropical fruit with a soft, orange flesh and black seeds in the center. It has a sweet and musky flavor, commonly eaten fresh or in smoothies."
+  },
+  {
+    "name": "Guava",
+    "price": 1.7,
+    "details": "A tropical fruit with a green or yellow skin and pink or white flesh. It has a sweet and slightly tart flavor, often eaten fresh or made into juices."
+  },
+  {
+    "name": "Pomegranate",
+    "price": 2.6,
+    "details": "A fruit with a tough outer skin and juicy, ruby-red seeds inside. Known for its antioxidant properties and tangy-sweet flavor."
+  },
+  {
+    "name": "Raspberry",
+    "price": 3.8,
+    "details": "A small, red or black berry with a sweet and slightly tart taste. Often enjoyed fresh, in jams, or as a dessert topping."
+  },
+  {
+    "name": "Blackberry",
+    "price": 3.2,
+    "details": "A juicy, dark purple berry with a slightly tart and sweet flavor. It is great for snacking, in desserts, or added to cereals."
+  },
+  {
+    "name": "Coconut",
+    "price": 3.0,
+    "details": "A tropical fruit with a hard, fibrous shell and sweet, white flesh inside. It is often used for its water, milk, or as a flavor in cooking and baking."
+  },
+  {
+    "name": "Lychee",
+    "price": 2.9,
+    "details": "A small, round fruit with a rough, red skin and sweet, juicy white flesh. It has a fragrant aroma and is commonly eaten fresh or in desserts."
+  },
+  {
+    "name": "Dragon Fruit",
+    "price": 4.2,
+    "details": "A vibrant, tropical fruit with a bright pink or yellow skin and white or red flesh speckled with tiny black seeds. It has a mildly sweet and refreshing flavor."
+  }
+]

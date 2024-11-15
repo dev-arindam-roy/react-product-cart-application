@@ -1,70 +1,464 @@
-# Getting Started with Create React App
+# React Product Cart App
+> A simple cart application with all options
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Check the Application
 
-## Available Scripts
+```js
+import React, { useEffect, useState, useRef } from 'react';
+import { useReactToPrint } from 'react-to-print';
+import * as htmlToImage from 'html-to-image';
+import download from 'downloadjs';
+import productJson from './fruits.json';
+import ProductItems from './ProductItems';
+import CartActionButtons from './CartActionButtons';
+import Cart from './Cart';
 
-In the project directory, you can run:
+const StaticJsonProductCart = () => {
+  const [productList, setProductList] = useState([]);
+  const [cartList, setCartList] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
 
-### `npm start`
+  const emitAddToCart = (keyIndex, itemName) => {
+    //get product/item by index, its not needed as find product by name
+    let cartItem = productJson[keyIndex];
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+    //find product/item by the name
+    cartItem = productList.find(
+      (item) => item.name.toLowerCase() === itemName.toLowerCase()
+    );
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+    let itemQty = 1;
 
-### `npm test`
+    // Check if the item already exists in the cart
+    const existingItemIndex = cartList.findIndex(
+      (item) => item.name === cartItem.name
+    );
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+    if (existingItemIndex !== -1) {
+      // Item exists in the cart, update the quantity
+      itemQty = cartList[existingItemIndex].qty + 1;
+      cartItem = { ...cartItem, qty: itemQty };
 
-### `npm run build`
+      // Create a copy of the cart list and update the item
+      const updatedCartList = [...cartList];
+      updatedCartList[existingItemIndex] = cartItem;
+      setCartList(updatedCartList);
+      saveInLocalStorage(updatedCartList);
+    } else {
+      // Item does not exist in the cart, add it with qty: 1
+      cartItem = { ...cartItem, qty: itemQty };
+      setCartList([...cartList, cartItem]);
+      saveInLocalStorage(cartList);
+    }
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+    //console.log(cartList);
+  };
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+  const emitOnCartItemRemoveHandler = (keyIndex) => {
+    const updatedCartList = cartList.filter((_, index) => index !== keyIndex);
+    setCartList(updatedCartList);
+    saveInLocalStorage(updatedCartList);
+  };
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+  const emitDeleteCartHandler = () => {
+    setCartList([]);
+    saveInLocalStorage([]);
+  };
 
-### `npm run eject`
+  const printRef = useRef();
+  const emitPrintHandler = useReactToPrint({
+    content: () => printRef.current,
+  });
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+  const emitScreenshotHandler = () => {
+    htmlToImage
+      .toPng(document.getElementById('printArea'))
+      .then(function (dataUrl) {
+        download(
+          dataUrl,
+          new Date().toISOString().replace(/[:.]/g, '-') + '.png'
+        );
+      });
+  };
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+  const saveInLocalStorage = (updatedCartList) => {
+    localStorage.setItem(
+      '_onex_simple_cartlist_',
+      JSON.stringify(updatedCartList)
+    );
+  };
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+  // Filter products based on the search term
+  const filteredProducts = productList.filter((item) =>
+    item.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+  //for search load
+  useEffect(() => {
+    if (searchTerm !== '') {
+      setProductList(filteredProducts);
+    } else {
+      setProductList(productJson);
+    }
+  }, [searchTerm]);
 
-## Learn More
+  //for localstorage load
+  useEffect(() => {
+    const storedProductListItems = localStorage.getItem(
+      '_onex_simple_cartlist_'
+    );
+    if (storedProductListItems) {
+      setCartList(JSON.parse(storedProductListItems));
+    }
+  }, []);
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+  //for initial page load
+  useEffect(() => {
+    setProductList(productJson);
+  }, []);
+  return (
+    <>
+      <div
+        style={{ width: '950px', margin: '60px auto', fontFamily: 'monospace' }}
+      >
+        <h1 style={{ textAlign: 'center' }}>
+          <strong>PRODUCT CART APPLICATION</strong>
+        </h1>
+        {cartList.length > 0 && (
+          <div
+            style={{
+              textAlign: 'center',
+              paddingTop: '5px',
+              paddingBottom: '5px',
+            }}
+          >
+            <CartActionButtons
+              printHandler={emitPrintHandler}
+              screenshotHandler={emitScreenshotHandler}
+              deleteCartHandler={emitDeleteCartHandler}
+            />
+          </div>
+        )}
+        <hr />
+        <div
+          style={{
+            width: '450px',
+            float: 'left',
+            maxHeight: '500px',
+            overflowY: 'scroll',
+          }}
+        >
+          <div style={{ padding: '0 15px 0 15px' }}>
+            <input
+              type='text'
+              placeholder='Search...'
+              style={{ width: '338px', padding: '8px' }}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          {productList.length > 0 ? (
+            productList.map((item, index) => {
+              return (
+                <ProductItems
+                  key={'productItem-' + index}
+                  sendItem={item}
+                  sendIndex={index}
+                  addToCart={emitAddToCart}
+                />
+              );
+            })
+          ) : (
+            <p>No Products Found!</p>
+          )}
+        </div>
+        <div style={{ width: '460px', float: 'right' }}>
+          <div
+            style={{
+              width: '100%',
+              fontFamily: 'monospace',
+              paddingBottom: '30px',
+            }}
+            ref={printRef}
+            id='printArea'
+          >
+            <Cart
+              sendCartList={cartList}
+              onCartItemRemove={emitOnCartItemRemoveHandler}
+            />
+          </div>
+        </div>
+        <div style={{ clear: 'both' }}></div>
+      </div>
+    </>
+  );
+};
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+export default StaticJsonProductCart;
+```
 
-### Code Splitting
+```js
+import React from 'react';
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+const ProductItems = ({ sendItem, sendIndex, addToCart }) => {
+  return (
+    <>
+      <div
+        key={'product-' + sendIndex}
+        style={{
+          float: 'left',
+          margin: '15px',
+          paddingBottom: '10px',
+          width: '150px',
+          border: '1px solid black',
+          padding: '6px',
+          textAlign: 'center',
+          borderRadius: '4px'
+        }}
+      >
+        <div style={{ textAlign: 'center' }}>
+          <img
+            src={require(`./images/${sendItem.name.toLowerCase()}.png`)}
+            alt={sendItem.name.toLowerCase()}
+            style={{ width: '60px' }}
+          />
+        </div>
+        <div>
+          <p>
+            <span style={{ fontSize: '16px' }}>{sendItem.name}</span>
+          </p>
+          <p style={{ lineHeight: '0px' }}>
+            <span
+              style={{
+                fontSize: '16px',
+                fontWeight: '600',
+                color: 'green',
+              }}
+            >
+              Rs.{parseFloat(sendItem.price).toFixed(2)}
+            </span>
+          </p>
+          <p>
+            <button
+              type='button'
+              style={{
+                padding: '6px',
+                backgroundColor: 'black',
+                color: 'white',
+                fontSize: '14px',
+                borderRadius: '4px',
+              }}
+              onClick={() => addToCart(sendIndex, sendItem.name)}
+            >
+              Add To Cart
+            </button>
+          </p>
+        </div>
+        <div style={{ clear: 'both' }}></div>
+      </div>
+    </>
+  );
+};
 
-### Analyzing the Bundle Size
+export default ProductItems;
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+```js
+import React, { useEffect, useState } from 'react';
 
-### Making a Progressive Web App
+const Cart = ({ sendCartList, onCartItemRemove }) => {
+  const [myCart, setMyCart] = useState([]);
+  const [totalAmount, setTotalAmount] = useState(0);
+  const calculateTotalAmount = () => {
+    let total = 0;
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+    // Ensure `getProductList` is defined and is an array
+    if (Array.isArray(myCart) && myCart.length > 0) {
+      myCart.forEach((item) => {
+        total += parseFloat(item.price) * parseFloat(item.qty);
+      });
+    }
 
-### Advanced Configuration
+    return total.toFixed(2);
+  };
+  // Update the cart when `sendCartList` changes
+  useEffect(() => {
+    setMyCart(sendCartList);
+  }, [sendCartList]);
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+  // Calculate the total amount when `myCart` changes
+  useEffect(() => {
+    const newTotalAmount = calculateTotalAmount();
+    setTotalAmount(newTotalAmount);
+  }, [myCart]);
+  
+  return (
+    <>
+      {myCart.length > 0 ? (
+        <div>
+          <h3>
+            Cart Items:({myCart.length}) - Rs.
+            {Math.round(totalAmount).toFixed(2)}
+          </h3>
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead style={{ borderBottom: '1px solid black' }}>
+              <tr>
+                <th style={{ textAlign: 'left' }}>SL</th>
+                <th style={{ textAlign: 'left' }}>Product</th>
+                <th style={{ textAlign: 'left' }}>Price</th>
+                <th style={{ textAlign: 'left' }}>QTY</th>
+                <th style={{ textAlign: 'right' }}>Total</th>
+                <th style={{ textAlign: 'right' }}>#</th>
+              </tr>
+            </thead>
+            <tbody>
+              {myCart.map((item, index) => {
+                return (
+                  <tr key={'cart-item-' + index}>
+                    <td style={{ textAlign: 'left' }}>{index + 1}</td>
+                    <td style={{ textAlign: 'left' }}>{item.name}</td>
+                    <td style={{ textAlign: 'left' }}>
+                      {parseFloat(item.price).toFixed(2)}
+                    </td>
+                    <td style={{ textAlign: 'left' }}>{item.qty}</td>
+                    <td style={{ textAlign: 'right' }}>
+                      {(parseFloat(item.price) * parseFloat(item.qty)).toFixed(
+                        2
+                      )}
+                    </td>
+                    <td style={{ textAlign: 'right' }}>
+                      <button
+                        type='button'
+                        style={{
+                          background: 'none',
+                          color: 'black',
+                          padding: '4px',
+                          fontSize: '14px',
+                          border: 'none',
+                        }}
+                        onClick={() => onCartItemRemove(index)}
+                      >
+                        [x]
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+            <tfoot
+              style={{
+                borderTop: '1px solid black',
+                borderBottom: '1px solid black',
+              }}
+            >
+              <tr>
+                <td
+                  colSpan={4}
+                  style={{
+                    textAlign: 'right',
+                    fontWeight: '600',
+                    paddingTop: '8px',
+                  }}
+                >
+                  Total Amount:
+                </td>
+                <td
+                  style={{
+                    fontWeight: 'bold',
+                    paddingTop: '8px',
+                    textAlign: 'right',
+                  }}
+                >
+                  {totalAmount}
+                </td>
+                <td></td>
+              </tr>
+              <tr>
+                <td
+                  colSpan={4}
+                  style={{
+                    textAlign: 'right',
+                    fontWeight: '600',
+                    paddingTop: '8px',
+                    paddingBottom: '8px',
+                  }}
+                >
+                  Total Payable Amount:
+                </td>
+                <td
+                  style={{
+                    fontWeight: 'bold',
+                    paddingTop: '8px',
+                    textAlign: 'right',
+                  }}
+                >
+                  {Math.round(totalAmount).toFixed(2)}
+                </td>
+                <td></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      ) : (
+        <p>No Cart Item(s)</p>
+      )}
+    </>
+  );
+};
 
-### Deployment
+export default Cart;
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+```js
+import React from 'react';
 
-### `npm run build` fails to minify
+const CartActionButtons = ({printHandler, screenshotHandler, deleteCartHandler}) => {
+  return (
+    <>
+      <button
+        type='button'
+        style={{
+          background: 'green',
+          color: 'white',
+          padding: '8px',
+          fontSize: '14px',
+          borderRadius: '4px',
+        }}
+        onClick={printHandler}
+      >
+        Print Cart
+      </button>
+      <button
+        type='button'
+        style={{
+          background: 'maroon',
+          color: 'white',
+          padding: '8px',
+          fontSize: '14px',
+          borderRadius: '4px',
+          marginLeft: '5px',
+        }}
+        onClick={screenshotHandler}
+      >
+        Screenshot
+      </button>
+      <button
+        type='button'
+        style={{
+          background: 'red',
+          color: 'white',
+          padding: '8px',
+          fontSize: '14px',
+          borderRadius: '4px',
+          marginLeft: '5px',
+        }}
+        onClick={deleteCartHandler}
+      >
+        Delete Cart
+      </button>
+    </>
+  );
+};
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+export default CartActionButtons;
+```
